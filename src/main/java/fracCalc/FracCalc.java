@@ -6,26 +6,24 @@ public class FracCalc {
     	Scanner userInput = new Scanner(System.in);
     	System.out.print("Welcome to Fraction Calculator! ");
     	System.out.println("Enter your operations below.");
-    	boolean check = true;
-    	while (check) {
-        	String value = userInput.nextLine();
-        	check = checkForQuit(value);
-        	
-        	if (check) {
-        		String output = produceAnswer(value);
-            	System.out.println(output);
+    	
+    	String equation = "";
+    	while (!equation.toLowerCase().equals("quit")) {
+        	equation = userInput.nextLine();
+        	if (!equation.toLowerCase().equals("quit")) {
+        		String result = produceAnswer(equation);
+            	System.out.println(result);
         	}
     	}
+    	
     	System.out.println("Exiting Fraction Calculator.");
     	userInput.close();
     }
 
     public static String produceAnswer(String input) {
     	String operand1 = input.substring(0,input.indexOf(' '));
-    	input = input.substring(input.indexOf(' ') + 1);
-    	String operator = input.substring(0, 1);
-    	input = input.substring(2);
-    	String operand2 = input;
+    	char operator = input.charAt(input.indexOf(' ') + 1);
+    	String operand2 = input.substring(input.indexOf(' ') + 3);
     	
     	int whole1 = parseWhole(operand1);
     	int numer1 = parseNumer(operand1);
@@ -34,18 +32,76 @@ public class FracCalc {
     	int whole2 = parseWhole(operand2);
     	int numer2 = parseNumer(operand2);
     	int denom2 = parseDenom(operand2);
-    	String components2 = ("whole:" + whole2 + " numerator:" + numer2 +
-    			" denominator:" + denom2);
-        return components2;
+    	
+    	String result = evaluate(whole1, numer1, denom1, 
+    			operator, whole2, numer2, denom2);
+    	
+        return result;
     }
     
-    public static boolean checkForQuit(String input) {
-    	String check = input.toLowerCase();
-    	if (check.equals("quit")) {
-    			return false;
+    public static String evaluate(int whole1, int numer1, int denom1, 
+    		char operator, int whole2, int numer2, int denom2) {
+    	if (operator == '+') {
+    		return add(whole1, numer1, denom1, whole2, numer2, denom2);
+    	} else if (operator == '-') {
+    		return subtract(whole1, numer1, denom1, whole2, numer2, denom2);
+    	} else if (operator == '*') {
+    		return multiply(whole1, numer1, denom1, whole2, numer2, denom2);
+    	} else if (operator == '/') {
+    		return divide(whole1, numer1, denom1, whole2, numer2, denom2);
     	} else {
-    		return true;
+    		return "error";
     	}
+    }
+    
+    public static String add(int whole1, int numer1, int denom1, 
+    		int whole2, int numer2, int denom2) {
+
+    	int fullNumer1 = improperNumer(whole1, numer1, denom1) * denom2;
+    	int fullNumer2 = improperNumer(whole2, numer2, denom2) * denom1;
+    	
+    	String resultImproper = (fullNumer1 + fullNumer2) + "/" + (denom1 * denom2);
+    	return resultImproper;
+    }
+    
+    public static String subtract(int whole1, int numer1, int denom1, 
+    		int whole2, int numer2, int denom2) {
+    	
+    	int fullNumer1 = improperNumer(whole1, numer1, denom1) * denom2;
+    	int fullNumer2 = improperNumer(whole2, numer2, denom2) * denom1;
+    	
+    	String resultImproper = (fullNumer1 - fullNumer2) + "/" + (denom1 * denom2);
+    	return resultImproper;
+    }
+    
+    public static String multiply(int whole1, int numer1, int denom1, 
+    		int whole2, int numer2, int denom2) {
+    	
+    	int fullNumer1 = improperNumer(whole1, numer1, denom1);
+    	int fullNumer2 = improperNumer(whole2, numer2, denom2);
+    	
+    	String resultImproper = (fullNumer1 * fullNumer2) + "/" + (denom1 * denom2);
+    	return resultImproper;
+    }
+    
+    public static String divide(int whole1, int numer1, int denom1, 
+    		int whole2, int numer2, int denom2) {
+    	
+    	int fullNumer1 = improperNumer(whole1, numer1, denom1);
+    	int fullNumer2 = improperNumer(whole2, numer2, denom2);
+    	String resultImproper = (fullNumer1 * denom2) + "/" + (denom1 * fullNumer2);
+    	return resultImproper;
+    }
+    
+    public static int improperNumer(int whole, int numer, int denom) {
+    	int fullNumer;
+    	if (whole < 0) {
+    		fullNumer = (whole * denom) - numer;
+    	} else {
+        	fullNumer = (whole * denom) + numer;   		
+    	}
+
+    	return fullNumer;
     }
     
     public static int parseWhole(String operand) {
@@ -81,4 +137,5 @@ public class FracCalc {
     		return 1;
     	}
     }
+    
 }
